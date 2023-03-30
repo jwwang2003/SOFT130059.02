@@ -1,105 +1,227 @@
 package lab5;
 
+/*
+ * Libraries for input
+ */
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class Main {
-  static Reader in = new Reader();
+  static final int numPlayers = 2;
 
   public static void main(String[] args) throws IOException {
-    Game game = new Game(in, 2);
+    ArrayList<String> playerNames = Game.getPlayerNames(numPlayers);
+    Game game = new Game();
 
-    String c = game.readTable(in);
+    game.readTable();
+    game.initPlayers(playerNames);
 
-    while(true) {
-      System.out.println("TEST");
-      char C = (char)in.read();
-      System.out.println(c + " " + C);
-      c = in.nextString();
+    while(game.runGame()) {
+      // loop until all players cannot play anymore
+
     }
 
-    // return;
+    game.printResults();
+
+    return;
   }
-
-
 }
 
+// Game driver handles input too!
 class Game {
+  // static Scanner in = new Scanner(System.in);
+  static Reader in = new Reader();
+
   private Map map;
-  private ArrayList<Player> players;
+  private ArrayList<Player> playerList; // contains refrences to hashMap
+  private HashMap<String, Player> playerHashList;
+  
+  private Player prevPlayer = null;
+  private String tempBuffer;
 
-  public Game(Reader in, int numPlayers) throws IOException {
+  private ArrayList<Player> winningPlayers;
+
+  public Game() {
     map = new Map();
-    players = new ArrayList<>();
+    playerList = new ArrayList<>();
+    playerHashList = new HashMap<>();
+    winningPlayers = new ArrayList<>();
+  }
 
-    for(int i = 0; i < numPlayers; ++i) {
-      String playerName = in.nextString();
-      players.add(new Player(playerName));
+  // Static functions
+  public static ArrayList<String> getPlayerNames(int n) throws IOException {
+    ArrayList<String> names = new ArrayList<>();
+    String s[] = in.readLine().split(" ");
+
+    for(int i = 0; i < s.length; ++i) {
+        names.add(s[i]);
+    }
+
+    return names;
+  }
+
+  public void initPlayers(ArrayList<String> names) {
+    for (String name : names) {
+      Player p = new Player(name);
+      playerList.add(p);
+      playerHashList.put(name, p);
     }
   }
 
-  public String readTable(Reader in) throws IOException {
+  public void readTable() throws IOException {
     ArrayList<ArrayList<Entity>> grid = new ArrayList<ArrayList<Entity>>();
     
     // initial values
-    int playerX = 0, playerY = 0;
+    int startX = 0, startY = 0;
     int winX = 0, winY = 0;
     int i = 0;
-    int c = 0;
     
     while (true) {
-      char s = (char) in.read();
+      // char s = in.next().charAt(0);
+      String input = in.readLine();
+      String s[] = input.split(" ");
 
-      if (s == ' ')
-        continue;
-      if (s == '\n') {
-        ++i;
-        c = 0;
-        continue;
-      }
-
-      if (!Character.isDigit(s)) {
-        String temp = in.nextString();
+      if (!Character.isDigit(input.charAt(0))) {
+        tempBuffer = input;
         map.setMap(grid);
+
         Player.setWinX(winX);
         Player.setWinY(winY);
 
-        for(Player p : players) {
-          p.setPos(playerX, playerY);
+        Player.setStartX(startX);
+        Player.setStartY(startY);
+
+        return;
+      }
+
+      grid.add(new ArrayList<Entity>());
+
+      for(int x = 0; x < s.length; ++x) {
+        if(s[x].charAt(0) == '0') {
+          grid.get(i).add(null);
         }
-
-        return s + temp;
+        if(s[x].charAt(0) == '1') {
+          grid.get(i).add(new Wall());
+        }
+        if (s[x].charAt(0) == '2') {
+          startX = i;
+          startY = grid.get(i).size();
+          grid.get(i).add(null);
+        } else if (s[x].charAt(0) == '3') {
+          winX = i;
+          winY = grid.get(i).size();
+          grid.get(i).add(null);
+        }
+        else if (s[x].charAt(0) == '4') {
+          grid.get(i).add(new Blockade());
+        }
+        else {
+          // invalid input
+          // no need to handle
+        }
       }
-
-      if (c == 0)
-        grid.add(new ArrayList<Entity>());
-
-      if(s == '0') {
-        grid.get(i).add(null);
-      }
-      if(s == '1') {
-        grid.get(i).add(new Wall());
-      }
-      if (s == '2') {
-        playerX = i;
-        playerY = grid.get(i).size();
-        grid.get(i).add(null);
-      } else if (s == '3') {
-        winX = i;
-        winY = grid.get(i).size();
-        grid.get(i).add(null);
-      }
-      else if (s == '4') {
-        grid.get(i).add(new Blockade());
-      }
-      else {
-        // invalid input
-      }
-
-      c++;
+      ++i;
     }
+  }
+
+  public boolean runGame() throws IOException {
+    String processed[] = tempBuffer.split(" ");
+    String playerName = processed[0];
+    char move = processed[1].charAt(0);
+
+    // Select player
+    Player p = playerHashList.get(playerName);
+
+    if(Player.getRemainingPlayers() == 1) {
+      prevPlayer = null;
+    }
+
+    if(p != prevPlayer && p.canPlay()) {
+      switch (move) {
+        case 'h':
+        case 'j':
+        case 'k':
+        case 'l':
+          int m = Player.Move.valueOf(Character.toString(move)).ordinal();
+          this.move(m, p);
+          // set prevPlayer to current player after a successful move
+          prevPlayer = p;
+          break;
+        case 'q':
+          p.forfeit();
+        case '\n':
+        case ' ':
+          break;
+        default:
+          p.invokedInvalidKeystroke();
+          break;
+      }
+    } else {
+      p.invokedWrongMove();
+    }
+
+    // SUB CHECKS
+    if(Player.getRemainingPlayers() == 0) return false;
+    if(p.hasWon()) winningPlayers.add(p);
+
+    // map.printMap();
+
+    // read another player's data
+    tempBuffer = in.readLine();
+
+    // return true for another round
+    return true;
+  }
+
+  public void printResults() {
+    for(Player p : playerList) {
+      System.out.println(
+        p.getName() + " " + p.getValidMoves() + " " + 
+        p.getWrongMoves() + " " + p.getInvalidKeystrokes() + " " + 
+        p.getOverlapMoves() + " " + p.getHitWallMoves()
+      );
+    }
+
+    if(winningPlayers.isEmpty()) {
+      System.out.println("draw");
+      return;
+    }
+
+    if(winningPlayers.size() > 1) {
+      Collections.sort(winningPlayers);
+    }
+
+    System.out.println(winningPlayers.get(0).getName());
+  }
+
+  private boolean move(int i, Player p) {
+    int [] playerPos = p.getPos();
+    int pX = playerPos[0], pY = playerPos[1];
+    int dX = pX + Player.d[i][0], dY = pY + Player.d[i][1];
+    // System.out.println(dX + " " + dY);
+
+    // if(!map.isBound(dX, dY)) return false;
+    // if(map.isWall(dX, dY) || map.isBlockade(dX, dY)) return false;
+    if (map.isWall(dX, dY)) {
+      p.invokedHitWallMove();
+      p.invokedValidMove();
+      return false;
+    }
+
+    if (map.isBlockade(dX, dY)) {
+      // overlapped with blockade
+      p.invokedOverlapMove();
+    }
+
+    p.setPos(dX, dY);
+
+    return true;
   }
 }
 
@@ -110,56 +232,50 @@ class Map {
     grid = new ArrayList<>();
   }
 
-  public int entityLookUp(Entity e) {
-    if(e == null) return 0;
-    if(e instanceof Wall) return 1;
-
-    // 2 - START POINT
-    // 3 - END POINT
-    if(e instanceof Blockade) return 4;
-
-    return -1;
+  public void printMap() {
+    for(int i = 0; i < grid.size(); ++i) {
+      for(int j = 0; j < grid.get(i).size(); ++j) {
+        Entity e = grid.get(i).get(j);
+        System.out.print( e != null ? e.getType() : 0);
+      }
+      System.out.println();
+    }
   }
 
   public int getPos(int x, int y) {
-    return this.entityLookUp(grid.get(x).get(y));
+    if(!isBound(x, y)) return -1;
+
+    Entity e = grid.get(x).get(y);
+
+    return e != null ? e.getType() : 0;
   }
 
-  public boolean isEmpty(int x, int y) {
-    return getPos(x, y) == 0;
-  }
+  public boolean isEmpty(int x, int y) { return getPos(x, y) == 0; }
+  public boolean isWall(int x, int y) { return getPos(x, y) == 1; }
+  public boolean isBlockade(int x, int y) { return getPos(x, y) == 4; }
 
-  public boolean isWall(int x, int y) {
-    return getPos(x, y) == 1;
-  }
+  public boolean isBound(int x, int y) { return grid.size() > x && x >= 0 && grid.get(x) != null && (grid.get(x).size() > y && y >= 0); }
 
-  public boolean isBlockade(int x, int y) {
-    return getPos(x, y) == 4;
-  }
-
-  public boolean isBound(int x, int y) {
-    return grid.size() > x && x >= 0 && grid.get(x) != null && (grid.get(x).size() > y && y >= 0);
-  }
-
-  public void setMap(ArrayList<ArrayList<Entity>> map) {
-    grid = map;
-  }
+  public void setMap(ArrayList<ArrayList<Entity>> map) { grid = map; }
 }
 
-class Blockade extends Entity {
-  public Blockade() {
-
-  }
-}
-
+// 墙
 class Wall extends Entity {
-  public Wall() {
-
-  }
+  public Wall() { this.setType(1); }
 }
 
-class Player extends Entity{
-  // displacement
+// 障碍物
+class Blockade extends Entity {
+  public Blockade() { this.setType(4); }
+}
+
+/* 
+ * 角色昵称   角色的合法移动次数  错误移动次数      错误输入指令数           与障碍物重叠的次数 碰墙的次数
+ * playName  validMoveCount   wrongMoveCount  invalidKeystrokeCount overlapCount    hitWallCount
+ * 
+ */
+
+class Player extends Entity implements Comparable<Player> {
   public final static int[][] d = {
     {0, -1},  // LEFT
     {1, 0},   // DOWN
@@ -168,49 +284,63 @@ class Player extends Entity{
   };
 
   public static enum Move {
-    h,
-    j,
-    k,
-    l,
-  }
+    h,  // LEFT
+    j,  // DOWN
+    k,  // UP
+    l,  // RIGHT
+  };
 
   private String name;
 
-  private int validMovesC;
-  private int errorMovesC;
-  private int invalidKeystrokesC;
-  private int overlapC;
-  private int hitWallC;
+  private int validMoveCount, wrongMoveCount,
+              invalidKeystrokeCount,
+              overlapCount, hitWallCount;
 
+  private static int startX, startY;
   private static int winX, winY;
-  private boolean won;
-  private boolean quit;
+  private boolean won, quit;
+
+  private static int remainingPlayers = 0;
 
   public Player(String name) {
     // Warning: x is UP DOWN, y is LEFT RIGHT
-    winX = 1;
     this.name = name;
+    setType(2); // Player is type 2
     
     // this.setPos(x, y);
 
-    validMovesC = 0;
-    errorMovesC = 0;
-    invalidKeystrokesC = 0;
-    overlapC = 0;
-    hitWallC = 0;
+    validMoveCount = 0;
+    wrongMoveCount = 0;
+    invalidKeystrokeCount = 0;
+    overlapCount = 0;
+    hitWallCount = 0;
+
+    setX(startX);
+    setY(startY);
 
     won = false;
     quit = false;
+
+    ++remainingPlayers;
   }
-  
+
   public void won() {
+    if(quit || won) return;
+
     assert(!quit);
-    
+
+    int pos[] = getPos();
+    assert(pos[0] == winX && pos[1] == winY);
+
+    --remainingPlayers;
+
     won = true;
   }
 
   public boolean forfeit() {
     if(quit || won) return false;
+
+    --remainingPlayers;
 
     return quit = !quit;
   }
@@ -218,28 +348,18 @@ class Player extends Entity{
   public boolean canPlay() {
     // the player can play if it has not won or quitted
 
-    return !(won && quit);
-  }
-  
-  public void moveInvoked() {
-    ++validMovesC;
+    return !(won || quit);
   }
 
-  public void errorMoveInvoked() {
-    ++errorMovesC;
-  }
-  
-  public void invalidKeystrokeInvoked() {
-    ++invalidKeystrokesC;
-  }
+  public boolean hasWon() { return won; }
 
-  public void overlapMoveInvoked() {
-    ++overlapC;
-  }
+  public static int getRemainingPlayers() { return remainingPlayers; }
 
-  public void hitWallInvoked() {
-    ++hitWallC;
-  }
+  public void invokedValidMove() { ++validMoveCount; }
+  public void invokedWrongMove() { ++wrongMoveCount; }
+  public void invokedInvalidKeystroke() { ++invalidKeystrokeCount; }
+  public void invokedOverlapMove() { ++overlapCount; }
+  public void invokedHitWallMove() { ++hitWallCount; }
 
   // Setter Methods
 
@@ -259,11 +379,11 @@ class Player extends Entity{
     this.setY(y);
 
     // check if new position is the final position
-    if(x == winX && y == winY) {
+    if(this.getX() == winX && this.getY() == winY) {
       won();
     }
 
-    moveInvoked();
+    invokedValidMove();
 
     return;
   }
@@ -274,30 +394,13 @@ class Player extends Entity{
     return name;
   }
 
-  public int[] getPos() {
-    int[] coord = { this.getX(), this.getY() };
-    return coord;
-  }
+  public int getValidMoves() { return validMoveCount; }
+  public int getWrongMoves() { return wrongMoveCount; }
+  public int getInvalidKeystrokes() { return invalidKeystrokeCount; }
+  public int getOverlapMoves() { return overlapCount; }
+  public int getHitWallMoves() { return hitWallCount; }
 
-  public int getTotalMoves() {
-    return validMovesC;
-  }
-
-  public int getTotalErrorMoves() {
-    return errorMovesC;
-  }
-
-  public int getTotalInvalidKeystrokes() {
-    return invalidKeystrokesC;
-  }
-
-  public int getTotalOverlapMoves() {
-    return overlapC;
-  }
-
-  public int getTotalHitWall() {
-    return hitWallC;
-  }
+  public int getScore() { return validMoveCount + overlapCount + hitWallCount; }
 
   // Static stuff
   public static void setWinX(int x) {
@@ -308,17 +411,24 @@ class Player extends Entity{
     winY = y;
   }
 
-  public static int getWinX() {
-    return winX;
+  public static void setStartX(int x) {
+    startX = x;
   }
 
-  public static int getWinY() {
-    return winY;
+  public static void setStartY(int y) {
+    startY = y;
+  }
+
+  // Comparator
+  @Override
+  public int compareTo(Player p) {
+    return this.getScore() - p.getScore();
   }
 }
 
 class Entity {
   private int x = 0, y = 0;
+  private int type = 0;
 
   // Setter methods
   
@@ -347,6 +457,14 @@ class Entity {
 
   public int[] getPos() {
     return (new int[]{x, y});
+  }
+
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int x) {
+    type = x;
   }
 }
 
@@ -384,21 +502,6 @@ class Reader {
       buf[cnt++] = (byte) c;
     }
     return new String(buf, 0, cnt);
-  }
-
-  public String nextString() throws IOException {
-    String s = "";
-
-    byte c = read();
-    while(c <= ' ') {
-      c = read();
-    }
-    while(Character.isLetterOrDigit(c)) {
-      s += (char)c;
-      c = read();
-    } 
-
-    return s;
   }
 
   public int nextInt() throws IOException {
@@ -466,7 +569,7 @@ class Reader {
       buffer[0] = -1;
   }
 
-  public byte read() throws IOException {
+  private byte read() throws IOException {
     if (bufferPointer == bytesRead)
       fillBuffer();
     return buffer[bufferPointer++];
