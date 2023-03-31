@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -76,20 +75,21 @@ class Game {
 
   public void readTable() throws IOException {
     ArrayList<ArrayList<Entity>> grid = new ArrayList<ArrayList<Entity>>();
-    
-    // initial values
+    int maxX = 0, maxY = 0;
     int startX = 0, startY = 0;
     int winX = 0, winY = 0;
     int i = 0;
     
     while (true) {
-      // char s = in.next().charAt(0);
       String input = in.readLine();
       String s[] = input.split(" ");
 
+      maxX = Math.max(maxX, i);
+      maxY = Math.max(maxY, s.length);
+
       if (!Character.isDigit(input.charAt(0))) {
         tempBuffer = input;
-        map.setMap(grid);
+        map.setMap(grid, maxX, maxY);
 
         Player.setWinX(winX);
         Player.setWinY(winY);
@@ -97,33 +97,33 @@ class Game {
         Player.setStartX(startX);
         Player.setStartY(startY);
 
-        return;
+        break;
       }
 
       grid.add(new ArrayList<Entity>());
 
       for(int x = 0; x < s.length; ++x) {
-        if(s[x].charAt(0) == '0') {
-          grid.get(i).add(null);
-        }
-        if(s[x].charAt(0) == '1') {
-          grid.get(i).add(new Wall());
-        }
-        if (s[x].charAt(0) == '2') {
-          startX = i;
-          startY = grid.get(i).size();
-          grid.get(i).add(null);
-        } else if (s[x].charAt(0) == '3') {
-          winX = i;
-          winY = grid.get(i).size();
-          grid.get(i).add(null);
-        }
-        else if (s[x].charAt(0) == '4') {
-          grid.get(i).add(new Blockade());
-        }
-        else {
-          // invalid input
-          // no need to handle
+        switch(s[x].charAt(0)) {
+          case '0':
+            grid.get(i).add(null); break;
+          case '1':
+            grid.get(i).add(new Wall()); break;
+          case '2':
+            startX = i;
+            startY = grid.get(i).size();
+            grid.get(i).add(null);
+            break;
+          case '3':
+            winX = i;
+            winY = grid.get(i).size();
+            grid.get(i).add(null);
+            break;
+          case '4':
+            grid.get(i).add(new Blockade());
+          default:
+            // invalid input
+            // no need to handle
+            break;
         }
       }
       ++i;
@@ -167,9 +167,9 @@ class Game {
     }
 
     // SUB CHECKS
-    if(Player.getRemainingPlayers() == 0) return false;
     if(p.hasWon()) winningPlayers.add(p);
-
+    if(Player.getRemainingPlayers() == 0) return false;
+    
     // map.printMap();
 
     // read another player's data
@@ -195,6 +195,7 @@ class Game {
 
     if(winningPlayers.size() > 1) {
       Collections.sort(winningPlayers);
+      // Collections.reverse(winningPlayers);
     }
 
     System.out.println(winningPlayers.get(0).getName());
@@ -226,26 +227,28 @@ class Game {
 }
 
 class Map {
-  private ArrayList<ArrayList<Entity>> grid;
+  // private ArrayList<ArrayList<Entity>> grid;
+  private Entity[][] fastGrid;
 
   public Map() {
-    grid = new ArrayList<>();
+    // grid = new ArrayList<>();
+    // fastGrid = new Entity[xLen][yLen];
   }
 
-  public void printMap() {
-    for(int i = 0; i < grid.size(); ++i) {
-      for(int j = 0; j < grid.get(i).size(); ++j) {
-        Entity e = grid.get(i).get(j);
-        System.out.print( e != null ? e.getType() : 0);
-      }
-      System.out.println();
-    }
-  }
+  // public void printMap() {
+  //   for(int i = 0; i < grid.size(); ++i) {
+  //     for(int j = 0; j < grid.get(i).size(); ++j) {
+  //       Entity e = grid.get(i).get(j);
+  //       System.out.print( e != null ? e.getType() : 0);
+  //     }
+  //     System.out.println();
+  //   }
+  // }
 
   public int getPos(int x, int y) {
-    if(!isBound(x, y)) return -1;
+    // if(!isBound(x, y)) return -1;
 
-    Entity e = grid.get(x).get(y);
+    Entity e = fastGrid[x][y];
 
     return e != null ? e.getType() : 0;
   }
@@ -254,9 +257,19 @@ class Map {
   public boolean isWall(int x, int y) { return getPos(x, y) == 1; }
   public boolean isBlockade(int x, int y) { return getPos(x, y) == 4; }
 
-  public boolean isBound(int x, int y) { return grid.size() > x && x >= 0 && grid.get(x) != null && (grid.get(x).size() > y && y >= 0); }
+  // not really useful
+  // public boolean isBound(int x, int y) { return grid.size() > x && x >= 0 && grid.get(x) != null && (grid.get(x).size() > y && y >= 0); }
 
-  public void setMap(ArrayList<ArrayList<Entity>> map) { grid = map; }
+  // public void setMap(ArrayList<ArrayList<Entity>> map) { grid = map; }
+  public void setMap(ArrayList<ArrayList<Entity>> grid, int xLen, int yLen) { 
+    fastGrid = new Entity[xLen][yLen];
+
+    for(int i = 0; i < grid.size(); ++i) {
+      for(int j = 0; j < grid.get(i).size(); ++j) {
+        fastGrid[i][j] = grid.get(i).get(j);
+      }
+    }
+  };
 }
 
 // 墙
