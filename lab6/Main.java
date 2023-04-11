@@ -33,8 +33,6 @@ public class Main {
   }
 }
 
-
-
 class Game {
   public final static int[][] d = {
     {0, -1},  // LEFT
@@ -216,13 +214,10 @@ class Game {
   private boolean move(int i, User user, int x, int y) {
     Map map = user.getMap();
     Stack<Entity> entityStack = map.getStack(x, y);
-    int dX, dY;
+    int dX = x + d[i][0];
+    int dY = y + d[i][1];
 
     if(entityStack.peek() instanceof Player) {
-      int playerPos[] = { x,  y };
-      dX = playerPos[0] + d[i][0];
-      dY = playerPos[1] + d[i][1];
-      
       user.invokedValidMove();
 
       if (map.isWall(dX, dY)) {
@@ -239,30 +234,25 @@ class Game {
           return false;
         }
       }
-    } else {
-      dX = x + d[i][0];
-      dY = y + d[i][1];
-
-      if (entityStack.peek() instanceof Box) {
-        if (map.isWall(dX, dY)) {
-          user.invokedBoxWallCollision();
-          return false;
-        }
-
-        if(map.isBlockade(dX, dY)) {
-          user.invokedBoxBlockadeCollision();
-          return false;
-        }
+    } else if (entityStack.peek() instanceof Box) {
+      if (map.isWall(dX, dY)) {
+        user.invokedBoxWallCollision();
+        return false;
       }
-    }  
 
-      Stack<Entity> curStack = map.getStack(x, y);
-      Stack<Entity> destStack = map.getStack(dX, dY);
-      destStack.push(curStack.pop());
+      if(map.isBlockade(dX, dY)) {
+        user.invokedBoxBlockadeCollision();
+        return false;
+      }
+    }
 
-      user.getPlayer().setPos(dX, dY);
+    Stack<Entity> curStack = map.getStack(x, y);
+    Stack<Entity> destStack = map.getStack(dX, dY);
+    destStack.push(curStack.pop());
 
-      return true;
+    user.getPlayer().setPos(dX, dY);
+
+    return true;
   }
 }
 
@@ -330,7 +320,6 @@ class User implements Comparable<User> {
     if(quit || won) return false;
 
     --remainingPlayers;
-
     return quit = !quit;
   }
 
@@ -402,7 +391,6 @@ class User implements Comparable<User> {
 }
 
 class Map {
-  
   private Stack<Entity>[][] fastGrid;
   private static int[][] templateGrid;
 
