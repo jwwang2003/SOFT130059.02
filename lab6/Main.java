@@ -7,11 +7,12 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import java.util.List;
-
+import java.util.function.Function;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+
+import java.util.EmptyStackException;
 
 public class Main {
   static final int numPlayers = 2;
@@ -189,36 +190,13 @@ class Game {
     return true;
   }
 
-  public void printResults() {
-    for(User p : userList) {
-      System.out.println(
-        p.getName() + " " + p.getValidMoves() + " " + 
-        p.getWrongMoves() + " " + p.getInvalidKeystrokes() + " " + 
-        p.getHitWallMoves() + " " + p.getOverlapMoves() + " " +
-        p.getBoxWallCollisions() + " " + p.getBoxBlockadeCollisions()
-      );
-    }
-
-    if(winningUsers.isEmpty()) {
-      System.out.println("draw");
-      return;
-    }
-
-    if(winningUsers.size() > 1) {
-      Collections.sort(winningUsers);
-      // Collections.reverse(winningPlayers);
-    }
-
-    System.out.println(winningUsers.get(0).getName());
-  }
-
   private boolean move(int i, User user, int x, int y) {
     Map map = user.getMap();
     Stack<Entity> entityStack = map.getStack(x, y);
     int dX = x + d[i][0];
     int dY = y + d[i][1];
 
-    if(entityStack.peek() instanceof Player) {
+    if(!entityStack.isEmpty() && entityStack.peek() instanceof Player) {
       user.invokedValidMove();
 
       if (map.isWall(dX, dY)) {
@@ -254,6 +232,29 @@ class Game {
     user.getPlayer().setPos(dX, dY);
 
     return true;
+  }
+
+  public void printResults() {
+    for(User p : userList) {
+      System.out.println(
+        p.getName() + " " + p.getValidMoves() + " " + 
+        p.getWrongMoves() + " " + p.getInvalidKeystrokes() + " " + 
+        p.getHitWallMoves() + " " + p.getOverlapMoves() + " " +
+        p.getBoxWallCollisions() + " " + p.getBoxBlockadeCollisions()
+      );
+    }
+
+    if(winningUsers.isEmpty()) {
+      System.out.println("draw");
+      return;
+    }
+
+    if(winningUsers.size() > 1) {
+      Collections.sort(winningUsers);
+      // Collections.reverse(winningPlayers);
+    }
+
+    System.out.println(winningUsers.get(0).getName());
   }
 }
 
@@ -310,7 +311,7 @@ class User implements Comparable<User> {
     assert(!quit);
 
     Stack<Entity> entityStack = map.getStack(winX, winY);
-    if(entityStack.peek() instanceof Box) {
+    if(entityStack.safeComparePeek((e) -> (e instanceof Box))) {
       won = true;
 
       --remainingPlayers;
@@ -434,10 +435,12 @@ class Map {
     }
   }
 
+  
+
   public boolean isEmpty(int x, int y) { return fastGrid[x][y] == null; }
-  public boolean isWall(int x, int y) { return fastGrid[x][y].peek() instanceof Wall; }
-  public boolean isBlockade(int x, int y) { return fastGrid[x][y].peek() instanceof Blockade; }
-  public boolean isBox(int x, int y) { return fastGrid[x][y].peek() instanceof Box; }
+  public boolean isWall(int x, int y) { return fastGrid[x][y].safeComparePeek((e) -> (e instanceof Wall)); }
+  public boolean isBlockade(int x, int y) { return fastGrid[x][y].safeComparePeek((e) -> (e instanceof Blockade)); }
+  public boolean isBox(int x, int y) { return fastGrid[x][y].safeComparePeek((e) -> (e instanceof Box)); }
 
   public void placePlayer(Player player, int pX, int pY) {
     fastGrid[pX][pY].push(player);
@@ -519,49 +522,69 @@ class Box extends Entity {
   public int getType() { return type; };
 }
 
-class Stack<T> {
-	@Override
-	public String toString() {
-		return "Stack [elements=" + elements + "]";
-	}
+/**
+ * A fast stack implementation that uses a linked list data structure
+ * - constant time complexity for push(), pop(), peek(), isEmpty(), and size() op
+ * - able to grow dynamically without the need for resizing an underlying array (better than using ArrayList)
+ */
+class Stack<E> {
+    private Node<E> top;
+    private int size;
 
-  private List<T> elements;
+    public Stack() {
+        top = null;
+        size = 0;
+    }
 
-  public Stack() {
-    elements = new ArrayList<>();
-  }
+    public boolean safeComparePeek(Function<E, Boolean> fn) {
+      try {
+        return fn.apply(this.peek());
+      } catch (EmptyStackException e) {
+        return false;
+      }
+    }
 
-  // returns the top of the stack
-	public T peek() {
-		if (elements.isEmpty()) {
-			return null;
-		}
-		return elements.get(elements.size() - 1);
-	}
-	
-  // pops and returns the top of the stack
-	public T pop() {
-		if (elements.isEmpty()) {
-			return null;
-		}
-		T top = elements.get(elements.size() - 1);
-		elements.remove(elements.size() - 1);
-		return top;
-	}
+    public void push(E element) {
+        Node<E> newNode = new Node<>(element);
+        newNode.next = top;
+        top = newNode;
+        size++;
+    }
 
-  // adds to the top of the stack
-	public void push(T element) {
-		elements.add(element);
-	}
+    public E pop() {
+        if (isEmpty()) {
+            throw new EmptyStackException();
+        }
+        E element = top.element;
+        top = top.next;
+        size--;
+        return element;
+    }
 
-  // get size of stack
-	public int size() {
-		return elements.size();
-	}
+    public E peek() {
+        if (isEmpty()) {
+            throw new EmptyStackException();
+        }
+        return top.element;
+    }
 
-	public boolean isEmpty() {
-		return elements.isEmpty();
-	}
+    public boolean isEmpty() {
+        return top == null;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    private static class Node<E> {
+        E element;
+        Node<E> next;
+
+        Node(E element) {
+            this.element = element;
+            this.next = null;
+        }
+    }
 }
 
 // Custom reader class
