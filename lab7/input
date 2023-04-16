@@ -1,0 +1,23 @@
+5 5
+Knight 0 0
+Witch 4 4
+Archer 4 0
+Knight l
+Archer k
+Witch k
+Archer 1 0 1
+Witch 2 2 3
+Knight j 
+Archer 2 3 4
+Witch h
+Knight j
+Witch 3 2 1 
+Archer 1 2 1
+Witch h
+Witch 2 2 1
+Knight 5
+Knight 4
+Archer 3 2 2
+Witch 4
+Knight 2 2 0
+End
