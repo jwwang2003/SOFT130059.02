@@ -527,6 +527,7 @@ class Box extends Entity {
  * - constant time complexity for push(), pop(), peek(), isEmpty(), and size() op
  * - able to grow dynamically without the need for resizing an underlying array (better than using ArrayList)
  */
+
 class Stack<E> {
     private Node<E> top;
     private int size;
