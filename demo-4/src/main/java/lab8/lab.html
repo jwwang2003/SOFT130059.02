@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lab 8</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="lab-8">Lab 8</h1>
+<h2 id="step-1">Step 1</h2>
+<p>课本练习8.7的要求如下</p>
+<p>Finds two points in a two-dimensional space nearest to each other. Use a two-dimensional array to represent the points. Test the program using the following points:</p>
+<pre><code class="language-java"><span class="hljs-type">double</span>[][] points = {{−<span class="hljs-number">1</span>, <span class="hljs-number">0</span>}, {−<span class="hljs-number">1</span>, −<span class="hljs-number">1</span>}, {<span class="hljs-number">4</span>, <span class="hljs-number">1</span>}, {<span class="hljs-number">2</span>, <span class="hljs-number">0.5</span>}, {<span class="hljs-number">3.5</span>, <span class="hljs-number">2</span>}, {<span class="hljs-number">3</span>, <span class="hljs-number">1.5</span>}, {−<span class="hljs-number">1.5</span>, <span class="hljs-number">4</span>}, {<span class="hljs-number">5.5</span>, <span class="hljs-number">4</span>}};
+</code></pre>
+<p>8.7要求用一个多维的数据来表示一个点的列表，这并不是一个很好的抽象。请用java的基于类的抽象、封装的方法重新设计，并将其命名为<code>Point.java</code>。</p>
+<p>注意：如果有多个对象距离最近，返回第一个，下同。</p>
+<p>相关代码写在package lab8.step1中</p>
+<p>样例输入</p>
+<pre><code>{−1, 0}
+{−1, −1}
+{4, 1}
+{2, 0.5}
+{3.5, 2}
+{3, 1.5}
+{−1.5, 4}
+{5.5, 4}
+END
+</code></pre>
+<p>样例输出</p>
+<pre><code>{-1, -1}
+{-1, 0}
+{3.5, 2}
+{3, 1.5}
+{3, 1.5}
+{3.5, 2}
+{-1, 0}
+{3.5, 2}
+</code></pre>
+<h2 id="step-2">Step 2</h2>
+<p>获取形状之间的最短距离</p>
+<p>本lab素材中的lab8.step2中提供了一组java类，具有如下结构</p>
+
+<img style="background-color:#FFF;" src="https://www.plantuml.com/plantuml/svg/RL7BRW8n3BpxAonEj2ZzW5LRKN60MoLKgMUJ3TcWa4Y9eGUw_zvuoMuhoislyOp7oyoK-7Jqe3tbZ6iJZuQJq--xWz5y0KIbeu-f10jhU2Nn_46o2-qo9zBSb_fRCbJAqDSzAmfdoW8lpO_8vEj43m0Xii7aRCSOztMqQVuEmhwmM7IXm4MGcnHbuUPn3XSlQ9ygFvZGeko6KOHBsflXXaIjE-Lwn7P8hbVyQkz7sBRGKB0LsHaHAj6NQxchcCrGdLPyIklEmXixyVbRgIhhVc_YXgijgDGhpXvdju_1vhypi2m6o2lX1m00"><p>利用继承和多态改造这组java类以实现Canvas类中下面增加的方法：</p>
+<pre><code class="language-java"><span class="hljs-comment">//获取canvas中距离指定几何对象最近的对象</span>
+<span class="hljs-keyword">public</span> GeometricObject <span class="hljs-title function_">getNearestObjectOf</span><span class="hljs-params">(GeometricObject obj)</span>
+</code></pre>
+<p>使得使用该方法能够得到Canvas中距离指定几何对象最近的对象。简化起见，圆形和矩形的距离定义均为其形状的中心点的距离。</p>
+<p>注意：需要忽略掉<em>相同</em>的对象。</p>
+<p>相关代码写在<code>package lab8.step2</code>中，尽可能复用step1的结果，必要时复制step1的代码至step2。</p>
+<p>用于测试样例的程序，要将输入的图形序列代表的，平面直角坐标系中的所有图形存储，圆形的输入序列为<code>C xaxis yaxis radius</code>，矩形的输入序列为<code>R xaxis yaxis height width</code>，并在<code>END</code>表征的输入结束后，输出所有输入图形的最近邻的图形</p>
+<p>（此处可直接调用 <code>System.out.println(GeometricObject)</code> ，因为circle对象与Rectangle对象均重写了<code>toString</code>方法）</p>
+<p>注意，圆形的坐标成员是圆心的坐标<code>(xaxis, yaxis)</code>，半径为<code>radius</code>，矩形的坐标成员是左下角端点的坐标<code>(xaxis, yaxis)</code>，矩形的长宽严格平行于坐标轴方向，并约定输入的矩形沿x轴方向的边为成员<code>width</code>，沿y轴方向的边为成员<code>height</code>。</p>
+<p>样例输入</p>
+<pre><code>C 1 1 2
+R 2 2 8 10
+R 2 2.5 1 1
+C 3 3 9
+END
+</code></pre>
+<p>样例输出</p>
+<pre><code>R 2 2.5 1 1
+C 3 3 9
+C 3 3 9
+R 2 2.5 1 1
+</code></pre>
+<h2 id="step-3">Step 3</h2>
+<p>上述代码中，getNearestObjectOf有可能会没有符合条件的结果。请思考此时应该如何设计这种异常的机制。需要考虑有哪些方式，并进行比较，之后会在课上进行讨论。提交PDF格式的文字说明。命名为<code>step3.pdf</code></p>
+<p>本次任务书的Markdown源码已经开放，大家可以对照学习一下课上讲的UML类图的绘制方法。例如，使用VS Code的同学，安装<code>PlantUML</code>插件之后，<strong>在插件的设置中（打开插件界面后插件图标旁边的齿轮），指定PantUML.server为<code>https://www.plantuml.com/plantuml</code></strong>，就可以显示类图，安装<code>Markdown All in One</code>插件之后就可以完整导出包含类图的markdown文档。</p>
+<h2 id="提交要求">提交要求</h2>
+<p>提交的压缩包目录结构如下：</p>
+<pre><code>`--lab8
+   `--src
+      `--main
+        `--java
+            `--lab8/
+              |--step3.pdf
+              |--step1/
+              |   |--Point.java
+              |   `--*.java
+              `--step2/
+                  |--Canvas.java
+                  |--GeometricObject.java
+                  |--Circle.java
+                  |--Rectangle.java
+                  `--*.java
+</code></pre>
+
+        
+        
+    </body>
+    </html>
