@@ -18,12 +18,23 @@ public class Canvas {
         return totalArea;
     }
 
+    public ArrayList<GeometricObject> getAllGeometricObjects() {
+        ArrayList<GeometricObject> arr = new ArrayList<>();
+
+        for(GeometricObject obj: gobjects) {
+            arr.add(this.getNearestObjectOf(obj));
+        }
+
+        return arr;
+    }
+
     public GeometricObject getNearestObjectOf(GeometricObject obj) {
         double cur = Double.MAX_VALUE;
         GeometricObject g = null;
 
         for(GeometricObject gobject : gobjects) {
-            if(gobject.equals(obj)) continue;
+            if(gobject.getClass().equals(obj.getClass())) continue;
+
             double t = gobject.compareCoordinate(obj);
             
             if(t < cur) {

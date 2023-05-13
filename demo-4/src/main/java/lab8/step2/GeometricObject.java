@@ -16,5 +16,4 @@ abstract public class GeometricObject extends Coordinate {
     }
 
     abstract public double getArea();
-
 }

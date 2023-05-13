@@ -9,6 +9,18 @@ public class Rectangle extends GeometricObject {
         this.width = width;
         this.x = x;
         this.y = y;
+        super.setX(x + (height/2.0));
+        super.setY(y + (width/2.0));
+    }
+
+    public Rectangle(int color, String x, String y, String height, String width) {
+        super(color);
+        this.height = Double.parseDouble(height);
+        this.width = Double.parseDouble(width);
+        this.x = Double.parseDouble(x);
+        this.y = Double.parseDouble(y);
+        super.setX(this.x - (this.height/2.0));
+        super.setY(this.y + (this.width/2.0));
     }
 
     public double getHeight() {
