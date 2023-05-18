@@ -28,8 +28,6 @@ public class Controller {
             String str;
             int y_axis = 0;
 
-
-
             while ((str = in.readLine()) != null) {
                 String[] row = str.split(" ");
                 Element[] elements = new Element[row.length];
@@ -56,6 +54,8 @@ public class Controller {
                 map.add(elements);
                 y_axis++;
             }
+
+            in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

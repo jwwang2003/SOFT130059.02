@@ -1,6 +1,7 @@
 module com.example.lab9 {
     requires javafx.controls;
     requires javafx.fxml;
+    requires transitive javafx.graphics;
 
 
     opens com.example.lab9 to javafx.fxml;
