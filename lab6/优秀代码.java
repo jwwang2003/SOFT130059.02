@@ -435,8 +435,6 @@ class Map {
     }
   }
 
-  
-
   public boolean isEmpty(int x, int y) { return fastGrid[x][y] == null; }
   public boolean isWall(int x, int y) { return fastGrid[x][y].safeComparePeek((e) -> (e instanceof Wall)); }
   public boolean isBlockade(int x, int y) { return fastGrid[x][y].safeComparePeek((e) -> (e instanceof Blockade)); }
