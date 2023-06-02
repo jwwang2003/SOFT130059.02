@@ -4,11 +4,12 @@ import com.example.lab10.gamelogic.movement.Direction;
 import com.example.lab10.gamelogic.movement.Displacement;
 import com.example.lab10.gamelogic.vectorspace.TwoComponents;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Position extends TwoComponents {
+public class Position extends TwoComponents implements Serializable {
     public static Position UP = new Position(Displacement.get(Direction.up));
     public static Position DOWN = new Position(Displacement.get(Direction.down));
     public static Position LEFT = new Position(Displacement.get(Direction.left));
@@ -16,14 +17,15 @@ public class Position extends TwoComponents {
 
     private int row, col;
     private int hashCode;
-    private List<MapEntity> children = new ArrayList<>();
+    private List<Entity> children = new ArrayList<>();
     static private List<Position> globalPositions = new ArrayList<>();
-    public Position(int row, int col) {
+    public Position(int row, int col, boolean isStatic) {
         this.col = col;
         this.row = row;
         this.hashCode = Objects.hash(row, col);
 
-        if(!globalPositions.contains(this)) globalPositions.add(this);
+        if(isStatic)
+            if(!globalPositions.contains(this)) globalPositions.add(this);
     }
 
     public Position(int []d) {
@@ -32,8 +34,8 @@ public class Position extends TwoComponents {
         this.hashCode = Objects.hash(row, col);
     }
 
-    public Position(int row, int col, List<MapEntity> entities) {
-        for(MapEntity entity : entities) {
+    public Position(int row, int col, List<Entity> entities) {
+        for(Entity entity : entities) {
             children.add(entity);
             entity.setPosition(this);
         }
@@ -58,7 +60,7 @@ public class Position extends TwoComponents {
 
     public int getY() { return getCol(); }
 
-    public List<MapEntity> getAllEntities() {
+    public List<Entity> getAllEntities() {
         return this.children;
     }
 
@@ -66,25 +68,26 @@ public class Position extends TwoComponents {
         return children.toString();
     }
 
-    public MapEntity popEntity() {
+    public Entity popEntity() {
         int ind = this.children.size() - 1;
         return ind > -1 ? this.children.remove(ind) : null;
     }
 
-    public MapEntity popEntity(int index) {
+    public Entity popEntity(int index) {
         return this.children.remove(index);
     }
 
-    public MapEntity popEntity(MapEntity entity) {
+    public Entity popEntity(Entity entity) {
         return this.children.remove(entity) ? entity : null;
     }
 
-    public void pushEntity(MapEntity entity) {
-        this.children.add(entity);
+    public Entity pushEntity(Entity entity) {
+        if(this.children.add(entity)) return entity;
+        else return null;
     }
-    public void _pushEntity(MapEntity entity) { this.children.add(0, entity); }
+    public void _pushEntity(Entity entity) { this.children.add(0, entity); }
 
-    public MapEntity peak() {
+    public Entity peak() {
         int ind = this.children.size() - 1;
         return ind > -1 ? this.children.get(ind) : null;
     }
@@ -106,7 +109,7 @@ public class Position extends TwoComponents {
                 break;
         }
 
-        move = new Position(row + move.row, col + move.col);
+        move = new Position(row + move.row, col + move.col, false);
 
         for(Position pos : globalPositions) {
             if(pos.equals(move)) return pos;

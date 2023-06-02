@@ -1,0 +1,90 @@
+* {
+    -fx-font-family: "Super Mario 256";
+}
+
+.text-area {
+    -fx-font-family: "Times New Roman";
+	-fx-accent: -fx-primary-color;
+	-fx-background-color: -fx-grey-color, white;
+	-fx-background-insets: 0, 0 0 1 0;
+	-fx-background-radius: 0;
+}
+.text-area:focused {
+	-fx-background-color: -fx-primary-color, white;
+}
+
+.menu-bar {
+  -fx-background-color: #ae530e;
+  -fx-opacity: 1;
+  -fx-border-width: 2.0;
+  -fx-padding: 5px;
+}
+
+.menu-bar .label {
+  -fx-font-size: 10pt;
+  -fx-text-fill: white;
+  -fx-font-weight: bold; 
+  -fx-padding: 2px 7px;
+}
+.menu-bar .menu-button:hover, .menu-bar .menu-button:focused, .menu-bar .menu-button:showing {
+  -fx-background: #742607;
+  -fx-opacity: 1;
+  -fx-text-fill: white;
+  -fx-background-radius: 5 5 5 5;
+}
+
+.menu-item {
+  -fx-padding: 0.0em 0.0em 0.0em 0.0em;
+  -fx-text-fill: black;
+  -fx-background: #8686867a;
+  -fx-background-radius: 5 5 5 5;
+}
+.menu-item .label{
+  -fx-font-size: 14.0 pt;
+  -fx-text-fill: black;
+}
+.menu-item .label:hover{
+  -fx-font-size: 14.0 pt;
+  -fx-background: #ae530e;
+  -fx-text-fill: white;
+}
+
+.context-menu {
+  /* -fx-background-color:black;
+  -fx-border-width: 0.2px;
+  -fx-border-color: black; */
+
+  -fx-background-color: rgba(255, 255, 255, 1);
+  -fx-background-insets: 0.0, 2.0, 2.0;
+  -fx-background-radius: 0.0 8 8 8;
+  -fx-padding: 0.25em;
+}
+
+.button {
+  -fx-padding: 10 10 10 10;
+
+  -fx-background-radius: 2;
+  -fx-background-color: #fff;
+  -fx-text-fill: #0f1111;
+
+  -fx-font-weight: bold;
+  -fx-font-size: 1em;
+}
+.button:hover {
+  /* -fx-background-color:
+          linear-gradient(from 0% 93% to 0% 100%, #9b9d9e 0%, #7a7c7d 100%),
+          #7a7c7d,
+          #9b9d9e,
+          radial-gradient(center 50% 50%, radius 100%, #9b9d9e, #7a7c7d); */
+  -fx-background-color: #e7e7e7;
+  -fx-effect: dropshadow(gaussian, rgba(213, 217, 217, .5) , 10, 0.1, 1, 1);
+}
+
+.button:pressed {
+  -fx-background-color: #ffffff;
+}
+
+.button Text {
+  -fx-fill: white;
+  -fx-effect: dropshadow( gaussian , #a30000 , 0,0,0,2 );
+}

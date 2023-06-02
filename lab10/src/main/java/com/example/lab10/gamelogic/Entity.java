@@ -1,19 +1,23 @@
 package com.example.lab10.gamelogic;
 
+import com.example.lab10.Constants;
 import com.example.lab10.gamelogic.movement.Direction;
 
-public abstract class MapEntity {
+import java.io.Serializable;
+
+public abstract class Entity implements MapIcon, Serializable {
     // pointer
     protected Position position;
 
-    public MapEntity() {
+    public Entity() {
 
     }
 
-    public MapEntity(Position position) {
+    public Entity(Position position) {
         position.pushEntity(this);
         this.position = position;
     }
+
     public Position getPosition() {
         return this.position;
     }
@@ -26,6 +30,6 @@ public abstract class MapEntity {
         this.position = pos;
     }
 
-    public abstract boolean pushBy(Map map, MapEntity element, Direction dir);
+    public abstract boolean pushBy(Map map, Entity element, Direction dir);
 }
 

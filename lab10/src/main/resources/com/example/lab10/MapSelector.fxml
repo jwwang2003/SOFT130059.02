@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0" prefWidth="300.0" stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.lab10.controller.MapSelectorController">
+   <children>
+      <VBox alignment="CENTER" layoutX="100.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TextArea fx:id="textArea" prefHeight="300.0" prefWidth="300.0" promptText="Enter a map">
+               <font>
+                  <Font name="Times New Roman" size="13.0" />
+               </font></TextArea>
+            <HBox alignment="CENTER">
+               <children>
+                  <Button fx:id="inputFile" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#inputFile" prefWidth="200.0" text="Choose file" />
+                  <Button fx:id="confirm" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#confirm" prefWidth="200.0" text="Confirm" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

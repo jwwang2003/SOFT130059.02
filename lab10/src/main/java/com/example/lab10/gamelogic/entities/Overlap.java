@@ -1,4 +1,4 @@
 package com.example.lab10.gamelogic.entities;
 
-public interface Stationary {
+public interface Overlap {
 }

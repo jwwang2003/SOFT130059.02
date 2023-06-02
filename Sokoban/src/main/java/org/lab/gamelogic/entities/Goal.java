@@ -5,9 +5,9 @@ import org.lab.gamelogic.Map;
 import org.lab.gamelogic.Position;
 import org.lab.gamelogic.movement.Direction;
 
-public class Wall extends Entity {
-    public Wall() {}
-    public Wall(Position position) {
+public class Goal extends Entity {
+    public Goal() {}
+    public Goal(Position position) {
         super(position);
     }
 
@@ -15,9 +15,8 @@ public class Wall extends Entity {
     public boolean pushBy(Map map, Entity element, Direction dir) {
         return false;
     }
-
     @Override
     public String toString() {
-        return "Entity [Wall] " + super.position;
+        return "Entity [Goal] " + super.position;
     }
 }
