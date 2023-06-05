@@ -5,7 +5,6 @@ import com.example.lab10.gamelogic.Entity;
 import com.example.lab10.gamelogic.Position;
 import com.example.lab10.gamelogic.movement.Direction;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 public class Space extends Entity implements Overlap {
     public Space() {}
@@ -20,16 +19,11 @@ public class Space extends Entity implements Overlap {
 
     @Override
     public String toString() {
-        return "Entity [Space] " + super.position;
+        return "Entity [Space] " + super.getPosition();
     }
 
     @Override
     public Image getImage() {
-        return null;
-    }
-
-    @Override
-    public Color getBorderColor() {
         return null;
     }
 }

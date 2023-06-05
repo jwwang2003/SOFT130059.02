@@ -111,10 +111,6 @@ public class Position extends TwoComponents implements Serializable {
 
         move = new Position(row + move.row, col + move.col, false);
 
-        for(Position pos : globalPositions) {
-            if(pos.equals(move)) return pos;
-        }
-
         return move;
     }
 

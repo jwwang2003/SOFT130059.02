@@ -12,7 +12,7 @@ public abstract class Movable extends Entity {
     }
 
     void moveTo(Direction dir) {
-        position = position.at(dir);
+        super.setPosition(getPosition().at(dir));
     }
 
     @Override
@@ -27,13 +27,23 @@ public abstract class Movable extends Entity {
             curEntity = map.popPosition(curPosition);
 
             nextEntity = map.getElementAt(targetPosition);
-            if(nextEntity instanceof Obstacle) targetPosition = map.getPosition(this.getPosition().at(dir), true);
 
-            targetPosition = map.getPosition(this.getPosition().at(dir));
-            if((nextEntity instanceof Overlap) && curEntity instanceof Movable) {
-                targetPosition.pushEntity(curEntity);
+            // when a box reaches the goal, it gets pushed under the goal with
+            // _pushEntity, so that it disappears from the game map signifying that
+            // the player has completed the task
+            if(nextEntity instanceof Goal && curEntity instanceof Box) {
+                // have to make sure that only the box gets pushed under the goal
+                targetPosition = map.getPosition(this.getPosition().at(dir), false);
+                targetPosition._pushEntity(curEntity);
+
+                this.moveTo(dir);
+                super.getPlayerSession().checkGameEnd();
             }
-            this.moveTo(dir);
+            else if((nextEntity instanceof Overlap) && curEntity instanceof Movable) {
+                targetPosition = map.getPosition(this.getPosition().at(dir), true);
+                targetPosition.pushEntity(curEntity);
+                this.moveTo(dir);
+            }
             return true;
         } else {
             return false;

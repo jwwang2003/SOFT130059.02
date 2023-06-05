@@ -7,7 +7,6 @@ import com.example.lab10.gamelogic.Map;
 import com.example.lab10.gamelogic.PlayerSession;
 import com.example.lab10.gamelogic.Position;
 import com.example.lab10.gamelogic.entities.Obstacle;
-import com.example.lab10.gamelogic.entities.Wall;
 import com.example.lab10.gamelogic.movement.Direction;
 import com.example.lab10.model.GameHolder;
 import javafx.application.Platform;
@@ -17,11 +16,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
@@ -32,13 +31,12 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainController {
     @FXML
     private BorderPane mainBorderContainer;
 
-    @FXML
-    private AnchorPane  centerAnchorContainer;
     @FXML
     private AnchorPane gameModeSelectionContainer;
 
@@ -51,17 +49,13 @@ public class MainController {
     private Canvas gameCanvas;
 
     @FXML
-    private VBox topBar, bottomBar;
+    ListView<PlayerSession> playerListView;
 
     @FXML
     public void initialize() {
-
-//        Stage stage = (Stage) mainBorderContainer.getScene().getWindow();
-        GameHolder holder = GameHolder.getInstance();
-
         // Set main background for canvas area
         // Retrieve blue sky wallpaper from resource folder and set it as the background
-        Image canvasBackground = new Image(Main.class.getResourceAsStream("images/backgroundSky.jpeg"));
+        Image canvasBackground = new Image(Objects.requireNonNull(Main.class.getResourceAsStream("images/backgroundSky.jpeg")));
         BackgroundImage bImg = new BackgroundImage(canvasBackground,
                 BackgroundRepeat.REPEAT,
                 BackgroundRepeat.REPEAT,
@@ -70,22 +64,25 @@ public class MainController {
         Background bGround = new Background(bImg);
         mainBorderContainer.setStyle("-fx-background-color: #5eb1f7;");
         gameCanvasAnchorContainer.setBackground(bGround);
-
-
     }
 
     @FXML
     private void singlePlayerMode() throws IOException {
         Stage thisStage = (Stage) mainBorderContainer.getScene().getWindow();
-        GameHolder holder = GameHolder.getInstance();
+        GameHolder gameHolder = GameHolder.getInstance();
 
-        Stage confirmExitModal = showMapSelectionModal(thisStage);
-        confirmExitModal.showAndWait();
+        if(!Map.getHasValidMap()) {
+            Stage mapSelectionModal = showMapSelectionModal(thisStage);
+            mapSelectionModal.showAndWait();
+        }
 
-        Stage player = playerInitialize(thisStage);
+        Stage player = this.playerInitialize(thisStage);
         player.showAndWait();
 
-        holder.setPlayState(true);
+
+
+        // game has started
+        gameHolder.setActiveState(true);
 
         gameModeSelectionContainer.setVisible(false);
         scrollCanvasContainer.setVisible(true);
@@ -94,28 +91,54 @@ public class MainController {
         gameCanvas.setHeight(75 * Constants.canvasRowCount);
         final GraphicsContext gc = gameCanvas.getGraphicsContext2D();
 
-        PlayerSession pS = new PlayerSession("Test", Color.RED);
-        holder.playerSessionList.add(pS);
+        updateCanvas();
+
+        playerListView.setCellFactory(new PlayerSessionCellFactory());
+        playerListView.getItems().add(gameHolder.playerSessionList.get(0));
+        playerListView.getItems().add(gameHolder.playerSessionList.get(0));
+
 
         Scene scene = mainBorderContainer.getScene();
+
         scene.setOnKeyPressed(e -> {
+//            playerListView.getItems().get(0).
             gc.clearRect(0, 0, gameCanvas.getWidth(), gameCanvas.getHeight());
             if (e.getCode() == KeyCode.A) {
-                holder.playerSessionList.get(0).move(Direction.left);
-                drawCanvas();
+                gameHolder.playerSessionList.get(0).move(Direction.left);
+                updateCanvas();
             }
             if (e.getCode() == KeyCode.W) {
-                holder.playerSessionList.get(0).move(Direction.up);
-                drawCanvas();
+                gameHolder.playerSessionList.get(0).move(Direction.up);
+                updateCanvas();
             }
             if (e.getCode() == KeyCode.S) {
-                holder.playerSessionList.get(0).move(Direction.down);
-                drawCanvas();
+                gameHolder.playerSessionList.get(0).move(Direction.down);
+                updateCanvas();
             }if (e.getCode() == KeyCode.D) {
-                holder.playerSessionList.get(0).move(Direction.right);
-                drawCanvas();
+                gameHolder.playerSessionList.get(0).move(Direction.right);
+                updateCanvas();
             }
 
+            if (e.getCode() == KeyCode.H) {
+                gameHolder.playerSessionList.get(1).move(Direction.left);
+                updateCanvas();
+            }
+            if (e.getCode() == KeyCode.U) {
+                gameHolder.playerSessionList.get(1).move(Direction.up);
+                updateCanvas();
+            }
+            if (e.getCode() == KeyCode.J) {
+                gameHolder.playerSessionList.get(1).move(Direction.down);
+                updateCanvas();
+            }if (e.getCode() == KeyCode.K) {
+                gameHolder.playerSessionList.get(1).move(Direction.right);
+                updateCanvas();
+            }
+
+        });
+
+        gameHolder.setOnGameFinish(() -> {
+            scene.setOnKeyPressed(null);
         });
     }
 
@@ -150,10 +173,15 @@ public class MainController {
     }
 
     public Stage playerInitialize(Stage owner) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("PlayerName.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("PlayCreation.fxml"));
         Stage stage = initModal(fxmlLoader);
         stage.initOwner(owner);
-        PlayerNameController controller = fxmlLoader.getController();
+
+        PlayerCreationController controller = fxmlLoader.getController();
+
+        controller.init(() -> {
+            stage.close();
+        });
 
         stage.setTitle("Player creation");
 
@@ -171,7 +199,7 @@ public class MainController {
                     // NOTE: Saving a mid-session game, saves a game ROM, it has nothing to do with the game map
 
                     GameHolder holder = GameHolder.getInstance();
-                    if(holder.getPlayState()) {
+                    if(holder.getActive()) {
                         Stage showSaveGameModal = null;
                         try {
                             showSaveGameModal = showSaveGameModal(stage);
@@ -215,7 +243,8 @@ public class MainController {
         return stage;
     }
 
-    public void drawCanvas() {
+    // ------------------------------------ CANVAS DRIVER ------------------------------------
+    public void updateCanvas() {
         drawStaticLayer();
         drawDynamicLayer();
     }
@@ -223,7 +252,6 @@ public class MainController {
     public void drawStaticLayer() {
         final GraphicsContext gc = gameCanvas.getGraphicsContext2D();
 
-        List<Position> map = GameHolder.getInstance().playerSessionList.get(0).getGameMap().getMapPositions();
         List<Position> _map = GameHolder.getInstance().playerSessionList.get(0).getGameMap()._mapPositions;
 
         for(Position pos: _map) {
@@ -270,10 +298,8 @@ public class MainController {
                         if(entity == null) continue;
                         gc.drawImage(entity.getImage(), entity.getPosition().getCol() * 75, entity.getPosition().getRow() * 75, 75, 75);
 
-                        if(colorList != null) {
-                            Color[] colorArr = colorList.toArray(new Color[0]);
-                            drawBorderBox(gc, entity.getPosition().getCol()*75, entity.getPosition().getRow()*75, colorArr);
-                        }
+                        Color[] colorArr = colorList.toArray(new Color[0]);
+                        drawBorderBox(gc, entity.getPosition().getCol()*75, entity.getPosition().getRow()*75, colorArr);
                     }
                 }
             }
@@ -281,13 +307,18 @@ public class MainController {
     }
 
     void drawBorderBox(GraphicsContext gc, double x, double y, Color... colors) {
-        Stop[] stops = new Stop[colors.length];
+        Stop[] stops = new Stop[colors.length == 1 ? 2 : colors.length];
 
         double lineWidth = 3.0;
         gc.setLineWidth(lineWidth);
 
         int i = 0;
-        for(Color c : colors) stops[i] = new Stop((1.0/(colors.length - 1))*((i++)*1.0), c);
+
+        if(colors.length == 1) {
+            stops[0] = new Stop(0, colors[0]);
+            stops[1] = new Stop(0, colors[0]);
+        } else
+            for(Color c : colors) stops[i] = new Stop((1.0/(colors.length - 1))*((i++)*1.0), c);
 
         LinearGradient linearGradient = new LinearGradient(x, y, x + 75,
                 y, false, null, stops);

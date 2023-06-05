@@ -37,10 +37,10 @@ public class Main extends Application {
             text = Map.readMapFromScanner(read, map);
 
             if(Map.setDefaultPositions(map)) {
-
+                // if can interpret map data then do nothing lah
             }
             else
-                throw new Exception("Unable to interpret default map data");
+                throw new Exception("Unable to interpret default map data:\n" + text);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
@@ -61,9 +61,10 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("GUI.fxml"));
         scene = new Scene((fxmlLoader.load()));
 
-        stage.setTitle("Sokoban");
+        stage.setTitle("倉庫番(sokoban)");
         stage.setScene(scene);
 
+        // Load custom font
         Font.loadFont(Main.class.getResourceAsStream("SuperMario256.ttf"), 12);
         // Debugging
 //        System.out.println(Main.class.getResource("SuperMario256.ttf").toExternalForm());

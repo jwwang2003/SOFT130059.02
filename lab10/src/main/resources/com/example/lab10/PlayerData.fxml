@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+
+<fx:root type="javafx.scene.control.ListCell"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+   <graphic>
+      <VBox fx:id="playerContainer">
+         <Label fx:id="playerName" style="-fx-font-size: 24px">
+         </Label>
+         <VBox>
+            <Label fx:id="playerScore">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+         </VBox>
+         <Label fx:id="playerHasWon" style="-fx-font-size: 40px;">
+
+         </Label>
+      </VBox>
+   </graphic>
+</fx:root>

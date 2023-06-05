@@ -1,83 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane id="mainBorderPane" fx:id="mainBorderContainer" stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.lab10.controller.MainController">
+<BorderPane id="mainBorderPane" fx:id="mainBorderContainer" stylesheets="@GUI.css" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.lab10.controller.MainController">
     <top>
-        <VBox fx:id="topBar" prefHeight="25.0" prefWidth="600.0">
-            <children>
-                <MenuBar>
-                    <menus>
-                        <Menu mnemonicParsing="false" text="File">
-                            <items>
-                                <MenuItem mnemonicParsing="false" text="New Game" />
-                                <MenuItem mnemonicParsing="false" text="Load Game File" />
-                                <MenuItem mnemonicParsing="false" text="Save Game File" />
-                                <MenuItem mnemonicParsing="false" text="Load Map" />
-                                <MenuItem mnemonicParsing="false" text="Exit" onAction="#safeExitGame" />
-                            </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Options">
-                            <items>
-                                <MenuItem mnemonicParsing="false" text="Settings" />
-                            </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Help">
-                            <items>
-                                <MenuItem mnemonicParsing="false" text="About" />
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
-            </children>
+        <VBox prefHeight="25.0" prefWidth="600.0">
+            <MenuBar>
+                <Menu mnemonicParsing="false" text="File">
+                    <MenuItem mnemonicParsing="false" text="New Game"/>
+                    <MenuItem mnemonicParsing="false" text="Load Game File"/>
+                    <MenuItem mnemonicParsing="false" text="Save Game File"/>
+                    <MenuItem mnemonicParsing="false" text="Load Map"/>
+                    <MenuItem mnemonicParsing="false" onAction="#safeExitGame" text="Exit"/>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Options">
+                    <MenuItem mnemonicParsing="false" text="Settings"/>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <MenuItem mnemonicParsing="false" text="About"/>
+                </Menu>
+            </MenuBar>
         </VBox>
     </top>
    <center>
-      <AnchorPane fx:id="centerAnchorContainer" prefHeight="503.0" prefWidth="502.0" BorderPane.alignment="CENTER">
-         <children>
-            <AnchorPane fx:id="gameModeSelectionContainer" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <VBox alignment="CENTER">
-                           <children>
-                              <Button maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#singlePlayerMode" prefHeight="45.0" prefWidth="150.0" text="Single Player">
-                                 <VBox.margin>
-                                    <Insets bottom="25.0" />
-                                 </VBox.margin>
-                              </Button>
-                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0" prefWidth="150.0" text="Two Players" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-            <ScrollPane fx:id="scrollCanvasContainer" fitToHeight="true" fitToWidth="true" pannable="true" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <content>
-                  <AnchorPane fx:id="gameCanvasAnchorContainer">
-                     <children>
-                        <Canvas fx:id="gameCanvas" height="500.0" width="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </ScrollPane>
-         </children>
-      </AnchorPane>
+       <AnchorPane prefHeight="503.0" prefWidth="502.0" BorderPane.alignment="CENTER">
+           <AnchorPane fx:id="gameModeSelectionContainer" prefHeight="200.0" prefWidth="200.0"
+                       AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                       AnchorPane.topAnchor="0.0">
+               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                   <VBox alignment="CENTER">
+                       <Button maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity"
+                               mnemonicParsing="false" onAction="#singlePlayerMode" prefHeight="45.0"
+                               prefWidth="150.0" text="Single Player">
+                           <VBox.margin>
+                               <Insets bottom="25.0"/>
+                           </VBox.margin>
+                       </Button>
+                       <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0"
+                               prefWidth="150.0" text="Two Players"/>
+                   </VBox>
+               </HBox>
+           </AnchorPane>
+           <ScrollPane fx:id="scrollCanvasContainer" fitToHeight="true" fitToWidth="true" pannable="true"
+                       visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                       AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <AnchorPane fx:id="gameCanvasAnchorContainer">
+                   <Canvas fx:id="gameCanvas" height="500.0" width="500.0" AnchorPane.bottomAnchor="0.0"
+                           AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+               </AnchorPane>
+           </ScrollPane>
+       </AnchorPane>
    </center>
    <right>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <ScrollPane prefViewportHeight="200.0" prefViewportWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <content>
-                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
-               </content>
-            </ScrollPane>
-         </children>
-      </AnchorPane>
+       <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+           <ListView fx:id="playerListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                     AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="2.0"
+                     AnchorPane.topAnchor="0.0"/>
+       </AnchorPane>
    </right>
 </BorderPane>

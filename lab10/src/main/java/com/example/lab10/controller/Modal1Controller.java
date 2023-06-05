@@ -1,7 +1,5 @@
 package com.example.lab10.controller;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.text.Text;
@@ -24,18 +22,8 @@ public class Modal1Controller {
         textMsg = mainMsg;
         displayText.setText(textMsg);
         Button1.setText(button1);
-        Button1.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                callback1.run();
-            }
-        });
+        Button1.setOnAction(event -> callback1.run());
         Button2.setText(button2);
-        Button2.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                callback2.run();
-            }
-        });
+        Button2.setOnAction(event -> callback2.run());
     }
 }

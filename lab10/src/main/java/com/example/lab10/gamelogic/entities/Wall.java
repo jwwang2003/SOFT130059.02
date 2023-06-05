@@ -10,7 +10,6 @@ import javafx.scene.paint.Color;
 
 public class Wall extends Entity implements MapIcon {
     static Image wallIcon;
-    Color boarderColor;
 
     public Wall() {}
     public Wall(Position position) {
@@ -23,7 +22,6 @@ public class Wall extends Entity implements MapIcon {
     }
 
     public Image getImage() { return wallIcon; }
-    public Color getBorderColor() { return this.boarderColor; }
 
     static public void setIcon(String str, double width, double height) {
         wallIcon = new Image(str, width, height, true, true);
@@ -31,6 +29,6 @@ public class Wall extends Entity implements MapIcon {
 
     @Override
     public String toString() {
-        return "Entity [Wall] " + super.position;
+        return "Entity [Wall] " + super.getPosition();
     }
 }

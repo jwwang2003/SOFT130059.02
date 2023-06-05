@@ -14,13 +14,15 @@ public class Map implements Serializable {
     static private List<List<Integer>> defaultPositions = new ArrayList<>();
     static private boolean hasValidMap = false;
 
-    static private Position startPosition;
-    static private Position finalPosition;
+    public Position startPosition;
+    public Position finalPosition;
 
     private List<Position> mapPositions = new ArrayList<>();    // keeps track of movable objects
+    private List<Box> boxEntities = new ArrayList<>();
     public List<Position> _mapPositions = new ArrayList<>();
 
     private GameBoy gameBoy;
+    private PlayerSession playerSession;
 
     public Map(List<Position> elements, Position finalPosition, GameBoy gameBoy) {
         this.mapPositions.addAll(elements);
@@ -28,7 +30,9 @@ public class Map implements Serializable {
         this.gameBoy = gameBoy;
     }
 
-    public Map() {
+    public Map(PlayerSession playerSession) {
+        this.playerSession = playerSession;
+
         int i = 0, j = 0;
 
         for(List<Integer> row : defaultPositions) {
@@ -59,10 +63,13 @@ public class Map implements Serializable {
                 }
 
                 if(newEntity != null) {
+                    newEntity.setPlayerSession(this.playerSession);
                     if(newEntity instanceof Movable) {
                         Position p = new Position(i, j, false);
                         newEntity.setPosition(p);
                         mapPositions.add(p);
+
+                        if(newEntity instanceof Box) boxEntities.add((Box) newEntity);
                     } else {
                         Position p = new Position(i, j, true);
                         newEntity.setPosition(p);
@@ -126,6 +133,7 @@ public class Map implements Serializable {
     public GameBoy getGameBoy() { return this.gameBoy; }
 
     public void moveGameBoy(Direction dir) {
+        playerSession.pushHistoryCallback.run();
         boolean result = this.gameBoy.pushBy(this, null, dir);
     }
 
@@ -161,6 +169,8 @@ public class Map implements Serializable {
     public List<Position> getMapPositions() {
         return mapPositions;
     }
+
+    public List<Box> getBoxEntities() { return this.boxEntities; }
 
     static public boolean getHasValidMap() {
         return hasValidMap;

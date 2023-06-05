@@ -1,13 +1,13 @@
 package com.example.lab10.gamelogic;
 
-import com.example.lab10.Constants;
 import com.example.lab10.gamelogic.movement.Direction;
 
 import java.io.Serializable;
 
 public abstract class Entity implements MapIcon, Serializable {
     // pointer
-    protected Position position;
+    private Position position;
+    private PlayerSession playerSessionReference;
 
     public Entity() {
 
@@ -18,9 +18,15 @@ public abstract class Entity implements MapIcon, Serializable {
         this.position = position;
     }
 
+    public PlayerSession getPlayerSession() { return this.playerSessionReference; }
+    public void setPlayerSession(PlayerSession playerSession) {
+        this.playerSessionReference = playerSession;
+    }
+
     public Position getPosition() {
         return this.position;
     }
+
     public void setPosition(Position pos) {
         if(this.position != null) {
             this.position.popEntity(this);
