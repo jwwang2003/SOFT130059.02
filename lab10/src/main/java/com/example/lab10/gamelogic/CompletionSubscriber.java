@@ -8,7 +8,7 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 
 public class CompletionSubscriber extends SubmissionPublisher<Boolean> implements Flow.Subscriber<Boolean> {
-    private List<Flow.Subscription> subscriptions = new ArrayList<>();
+    private final List<Flow.Subscription> subscriptions = new ArrayList<>();
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {

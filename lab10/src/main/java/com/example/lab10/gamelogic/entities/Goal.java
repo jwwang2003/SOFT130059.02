@@ -11,9 +11,6 @@ public class Goal extends Entity implements Overlap, MapIcon {
     static Image mapIcon;
 
     public Goal() {}
-    public Goal(Position position) {
-        super(position);
-    }
 
     @Override
     public boolean pushBy(Map map, Entity element, Direction dir) {

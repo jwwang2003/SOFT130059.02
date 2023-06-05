@@ -8,10 +8,6 @@ public class Box extends Movable {
     static Image mapIcon;
     public Box() {}
 
-    public Box(Position position) {
-        super(position);
-    }
-
     @Override
     public boolean pushBy(Map map, Entity element, Direction dir) {
         if (element instanceof Box)

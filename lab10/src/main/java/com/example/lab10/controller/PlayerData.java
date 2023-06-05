@@ -19,9 +19,6 @@ public class PlayerData extends ListCell<PlayerSession> {
     Label playerName;
 
     @FXML
-    Label playerScore;
-
-    @FXML
     Label playerHasWon;
 
     public PlayerData() {

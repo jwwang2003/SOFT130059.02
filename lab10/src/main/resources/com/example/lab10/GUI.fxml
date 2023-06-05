@@ -42,7 +42,7 @@
                            </VBox.margin>
                        </Button>
                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0"
-                               prefWidth="150.0" text="Two Players"/>
+                               prefWidth="150.0" text="Two Players" onAction="#twoPlayerMode"/>
                    </VBox>
                </HBox>
            </AnchorPane>

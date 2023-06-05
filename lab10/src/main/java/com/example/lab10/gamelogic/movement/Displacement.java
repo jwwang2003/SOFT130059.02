@@ -11,26 +11,16 @@ public class Displacement {
   };
 
   static public int[] get(Direction dir) {
-    switch(dir) {
-      case left:
-        return d[0];
-      case down:
-        return d[1];
-      case up:
-        return d[2];
-      case right:
-        return d[3];
-      default:
-        return null;
-    }
+    return switch (dir) {
+      case left -> d[0];
+      case down -> d[1];
+      case up -> d[2];
+      case right -> d[3];
+    };
   }
 
   static public int[] get(InputDirection iDir) {
     int index = iDir.ordinal();
     return d[index];
-  }
-
-  static public int[] get(Character c) {
-    return get(InputDirection.valueOf(Character.toString(c)));
   }
 }

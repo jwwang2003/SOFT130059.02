@@ -10,7 +10,6 @@ import com.example.lab10.gamelogic.entities.Obstacle;
 import com.example.lab10.gamelogic.movement.Direction;
 import com.example.lab10.model.GameHolder;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -137,9 +136,7 @@ public class MainController {
 
         });
 
-        gameHolder.setOnGameFinish(() -> {
-            scene.setOnKeyPressed(null);
-        });
+        gameHolder.setOnGameFinish(() -> scene.setOnKeyPressed(null));
     }
 
     @FXML
@@ -148,7 +145,7 @@ public class MainController {
     }
 
     @FXML
-    private void safeExitGame(ActionEvent event) throws IOException {
+    private void safeExitGame() throws IOException {
         Stage thisStage = (Stage) mainBorderContainer.getScene().getWindow();
         // 1. Ask if user actually wants to exit the game
         //  2yes. Check if game in session
@@ -165,7 +162,6 @@ public class MainController {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("MapSelector.fxml"));
         Stage stage = initModal(fxmlLoader);
         stage.initOwner(owner);
-        MapSelectorController controller = fxmlLoader.getController();
 
         stage.setTitle("Input a map");
 
@@ -173,15 +169,13 @@ public class MainController {
     }
 
     public Stage playerInitialize(Stage owner) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("PlayCreation.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("PlayerCreation.fxml"));
         Stage stage = initModal(fxmlLoader);
         stage.initOwner(owner);
 
         PlayerCreationController controller = fxmlLoader.getController();
 
-        controller.init(() -> {
-            stage.close();
-        });
+        controller.init(stage::close);
 
         stage.setTitle("Player creation");
 
@@ -200,7 +194,7 @@ public class MainController {
 
                     GameHolder holder = GameHolder.getInstance();
                     if(holder.getActive()) {
-                        Stage showSaveGameModal = null;
+                        Stage showSaveGameModal;
                         try {
                             showSaveGameModal = showSaveGameModal(stage);
                         } catch (IOException e) {
@@ -256,7 +250,7 @@ public class MainController {
 
         for(Position pos: _map) {
             if(pos.peak() instanceof Obstacle && GameHolder.getInstance().hasPlayer(pos)) {
-                gc.drawImage(pos.peak().getImage(), pos.getCol()*75, pos.getRow()*75 + (75-75/6), 75, 75/6);
+                gc.drawImage(pos.peak().getImage(), pos.getCol()*75, pos.getRow()*75 + (75 - (75/6.0)), 75, 75/6.0);
             } else {
                 gc.drawImage(pos.peak().getImage(), pos.getCol()*75, pos.getRow()*75, 75, 75);
             }
@@ -266,40 +260,73 @@ public class MainController {
     public void drawDynamicLayer() {
         final GraphicsContext gc = gameCanvas.getGraphicsContext2D();
 
-        List<Color>[][] stackColor = new ArrayList[Constants.canvasRowCount][Constants.canvasColCount];
-        List<Entity>[][] stack = new ArrayList[Constants.canvasRowCount][Constants.canvasColCount];
+//        List<Color>[][] stackColor = new ArrayList[Constants.canvasRowCount][Constants.canvasColCount];
+//        List<Entity>[][] stack = new ArrayList[Constants.canvasRowCount][Constants.canvasColCount];
+//        GameHolder gameHolder = GameHolder.getInstance();
+//
+//        for (int i = 0; i < Constants.canvasRowCount; i++) {
+//            for (int j = 0; j < Constants.canvasColCount; j++) {
+//                stackColor[i][j] = new ArrayList<>();
+//                stack[i][j] = new ArrayList<>();
+//            }
+//        }
+//
+//        for(PlayerSession pS: gameHolder.playerSessionList) {
+//            for(Position pos : pS.getGameMap().getMapPositions()) {
+//                stackColor[pos.getRow()][pos.getCol()].add(pS.getPlayerColor());
+//                stack[pos.getRow()][pos.getCol()].add(pos.peak());
+//            }
+//        }
+
+        // Create lists of lists for stackColor and stack
+        List<List<List<Color>>> stackColor = new ArrayList<>();
+        List<List<List<Entity>>> stack = new ArrayList<>();
         GameHolder gameHolder = GameHolder.getInstance();
 
+        // Initialize the lists
         for (int i = 0; i < Constants.canvasRowCount; i++) {
+            stackColor.add(new ArrayList<>());
+            stack.add(new ArrayList<>());
             for (int j = 0; j < Constants.canvasColCount; j++) {
-                stackColor[i][j] = new ArrayList<>();
-                stack[i][j] = new ArrayList<>();
+                stackColor.get(i).add(new ArrayList<>());
+                stack.get(i).add(new ArrayList<>());
             }
         }
 
+        // Rest of the code...
         for(PlayerSession pS: gameHolder.playerSessionList) {
             for(Position pos : pS.getGameMap().getMapPositions()) {
-                stackColor[pos.getRow()][pos.getCol()].add(pS.getPlayerColor());
-                stack[pos.getRow()][pos.getCol()].add(pos.peak());
+                stackColor.get(pos.getRow()).get(pos.getCol()).add(pS.getPlayerColor());
+                stack.get(pos.getRow()).get(pos.getCol()).add(pos.peak());
             }
         }
 
-        for(int i = 0; i < stack.length; ++i) {
-            List<Entity>[] row = stack[i];
-            List<Color>[] colorRow = stackColor[i];
+        for(int i = 0; i < stack.size(); ++i) {
+            List<List<Entity>> row = stack.get(i);
+            List<List<Color>> colorRow = stackColor.get(i);
 
-            for(int j = 0; j < row.length; ++j) {
-                List<Entity> entityList = row[j];
-                List<Color> colorList = colorRow[j];
+            for(int j = 0; j < row.size(); ++j) {
+                List<Entity> entityList = row.get(j);
+                List<Color> colorList = colorRow.get(j);
 
                 if(entityList != null) {
-                    for (int z = 0; z < entityList.size(); ++z) {
-                        Entity entity = entityList.get(z);
-                        if(entity == null) continue;
-                        gc.drawImage(entity.getImage(), entity.getPosition().getCol() * 75, entity.getPosition().getRow() * 75, 75, 75);
+                    for (Entity entity : entityList) {
+                        if (entity == null) continue;
+                        gc.drawImage(
+                                entity.getImage(),
+                                entity.getPosition().getCol() * 75,
+                                entity.getPosition().getRow() * 75,
+                                75,
+                                75
+                        );
 
                         Color[] colorArr = colorList.toArray(new Color[0]);
-                        drawBorderBox(gc, entity.getPosition().getCol()*75, entity.getPosition().getRow()*75, colorArr);
+                        drawBorderBox(
+                                gc,
+                                entity.getPosition().getCol() * 75,
+                                entity.getPosition().getRow() * 75,
+                                colorArr
+                        );
                     }
                 }
             }

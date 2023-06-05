@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main extends Application {
-    private Scene scene;
 
     private void initEntityIcons() {
         GameBoy.setIcon(getResourcePath("images/entities/Character1.png"), 1200, 1200);
@@ -29,20 +29,17 @@ public class Main extends Application {
     private void initReadDefaultMap() {
         try {
             Scanner read = new Scanner(new File(
-                    Main.class.getResource("defaultMap.txt").toURI()
+                    Objects.requireNonNull(Main.class.getResource("defaultMap.txt")).toURI()
             ), StandardCharsets.UTF_8);
 
-            String text = "";
+            String text;
             List<List<Integer>> map = new ArrayList<>();
             text = Map.readMapFromScanner(read, map);
 
-            if(Map.setDefaultPositions(map)) {
-                // if can interpret map data then do nothing lah
-            }
-            else
+            if(!Map.setDefaultPositions(map)) {
                 throw new Exception("Unable to interpret default map data:\n" + text);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -50,7 +47,7 @@ public class Main extends Application {
     }
 
     public String getResourcePath(String file) {
-        return Main.class.getResource(file).toExternalForm();
+        return Objects.requireNonNull(Main.class.getResource(file)).toExternalForm();
     }
 
     @Override
@@ -59,7 +56,7 @@ public class Main extends Application {
         initReadDefaultMap();
 
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("GUI.fxml"));
-        scene = new Scene((fxmlLoader.load()));
+        Scene scene = new Scene((fxmlLoader.load()));
 
         stage.setTitle("倉庫番(sokoban)");
         stage.setScene(scene);

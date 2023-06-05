@@ -20,8 +20,6 @@ public class PlayerCreationController {
         GameHolder gameHolder = GameHolder.getInstance();
         if(gameHolder.playerSessionList.size() <= 1) {
             playerInput2.setDisable(true);
-        } else {
-
         }
     }
 

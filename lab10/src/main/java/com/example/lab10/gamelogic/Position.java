@@ -15,10 +15,11 @@ public class Position extends TwoComponents implements Serializable {
     public static Position LEFT = new Position(Displacement.get(Direction.left));
     public static Position RIGHT = new Position(Displacement.get(Direction.right));
 
-    private int row, col;
-    private int hashCode;
-    private List<Entity> children = new ArrayList<>();
-    static private List<Position> globalPositions = new ArrayList<>();
+    private final int row;
+    private final int col;
+    private final int hashCode;
+    private final List<Entity> children = new ArrayList<>();
+    static private final List<Position> globalPositions = new ArrayList<>();
     public Position(int row, int col, boolean isStatic) {
         this.col = col;
         this.row = row;
@@ -73,17 +74,12 @@ public class Position extends TwoComponents implements Serializable {
         return ind > -1 ? this.children.remove(ind) : null;
     }
 
-    public Entity popEntity(int index) {
-        return this.children.remove(index);
+    public void popEntity(Entity entity) {
+        this.children.remove(entity);
     }
 
-    public Entity popEntity(Entity entity) {
-        return this.children.remove(entity) ? entity : null;
-    }
-
-    public Entity pushEntity(Entity entity) {
-        if(this.children.add(entity)) return entity;
-        else return null;
+    public void pushEntity(Entity entity) {
+        this.children.add(entity);
     }
     public void _pushEntity(Entity entity) { this.children.add(0, entity); }
 
@@ -93,35 +89,21 @@ public class Position extends TwoComponents implements Serializable {
     }
 
     public Position at(Direction dir) {
-        Position move = null;
-        switch (dir) {
-            case up:
-                move = UP;
-                break;
-            case down:
-                move = DOWN;
-                break;
-            case left:
-                move = LEFT;
-                break;
-            case right:
-                move = RIGHT;
-                break;
-        }
+        Position move = switch (dir) {
+            case up -> UP;
+            case down -> DOWN;
+            case left -> LEFT;
+            case right -> RIGHT;
+        };
 
         move = new Position(row + move.row, col + move.col, false);
 
         return move;
     }
 
-    static public List<Position> getGlobalPositions() {
-        return globalPositions;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Position) {
-            Position p = (Position) obj;
+        if (obj instanceof Position p) {
             return p.getX() == this.row && p.getY() == this.col;
         }
         return false;

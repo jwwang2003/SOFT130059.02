@@ -34,8 +34,7 @@ public class MapSelectorController {
         }
 
         textArea.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
-            if (newPropertyValue) {}
-            else {
+            if (!newPropertyValue) {
                 textAreaOnChange();
             }
         });
@@ -54,7 +53,7 @@ public class MapSelectorController {
         Scanner read = new Scanner(file, StandardCharsets.UTF_8);
 //        read.useDelimiter(" ");
 
-        String text = "";
+        String text;
         List<List<Integer>> map = new ArrayList<>();
         text = Map.readMapFromScanner(read, map);
 
@@ -74,7 +73,7 @@ public class MapSelectorController {
             setTextAreaError();
     }
 
-    public void confirm() throws IOException {
+    public void confirm() {
         if(Map.getHasValidMap() && hasValidInput) {
             Stage stage = (Stage) confirm.getScene().getWindow();
             stage.close();

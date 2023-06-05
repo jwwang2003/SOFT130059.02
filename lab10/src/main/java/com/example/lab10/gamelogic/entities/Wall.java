@@ -3,18 +3,13 @@ package com.example.lab10.gamelogic.entities;
 import com.example.lab10.gamelogic.Map;
 import com.example.lab10.gamelogic.Entity;
 import com.example.lab10.gamelogic.MapIcon;
-import com.example.lab10.gamelogic.Position;
 import com.example.lab10.gamelogic.movement.Direction;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 public class Wall extends Entity implements MapIcon {
     static Image wallIcon;
 
     public Wall() {}
-    public Wall(Position position) {
-        super(position);
-    }
 
     @Override
     public boolean pushBy(Map map, Entity element, Direction dir) {

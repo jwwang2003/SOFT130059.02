@@ -17,12 +17,11 @@ public class Map implements Serializable {
     public Position startPosition;
     public Position finalPosition;
 
-    private List<Position> mapPositions = new ArrayList<>();    // keeps track of movable objects
-    private List<Box> boxEntities = new ArrayList<>();
+    private final List<Position> mapPositions = new ArrayList<>();    // keeps track of movable objects
+    private final List<Box> boxEntities = new ArrayList<>();
     public List<Position> _mapPositions = new ArrayList<>();
 
     private GameBoy gameBoy;
-    private PlayerSession playerSession;
 
     public Map(List<Position> elements, Position finalPosition, GameBoy gameBoy) {
         this.mapPositions.addAll(elements);
@@ -31,7 +30,6 @@ public class Map implements Serializable {
     }
 
     public Map(PlayerSession playerSession) {
-        this.playerSession = playerSession;
 
         int i = 0, j = 0;
 
@@ -41,29 +39,23 @@ public class Map implements Serializable {
                 Entity newEntity = null;
 
                 switch (element) {
-                    case 1:
-                        newEntity = new Wall();
-                        break;
-                    case 2:
+                    case 1 -> newEntity = new Wall();
+                    case 2 -> {
                         startPosition = new Position(i, j, true);
                         newEntity = gameBoy = new GameBoy();
-                        break;
-                    case 3:
+                    }
+                    case 3 -> {
                         finalPosition = new Position(i, j, true);
                         newEntity = new Goal();
-                        break;
-                    case 4:
-                        newEntity = new Obstacle();
-                        break;
-                    case 5:
-                        newEntity = new Box();
-                        break;
-                    default:
-                        break;
+                    }
+                    case 4 -> newEntity = new Obstacle();
+                    case 5 -> newEntity = new Box();
+                    default -> {
+                    }
                 }
 
                 if(newEntity != null) {
-                    newEntity.setPlayerSession(this.playerSession);
+                    newEntity.setPlayerSession(playerSession);
                     if(newEntity instanceof Movable) {
                         Position p = new Position(i, j, false);
                         newEntity.setPosition(p);
@@ -83,8 +75,6 @@ public class Map implements Serializable {
             ++i;
             j = 0;
         }
-
-        return;
     }
 
     public Entity getElementAt(Position pos) {
@@ -130,40 +120,33 @@ public class Map implements Serializable {
         return null;
     }
 
-    public GameBoy getGameBoy() { return this.gameBoy; }
-
     public void moveGameBoy(Direction dir) {
-        playerSession.pushHistoryCallback.run();
-        boolean result = this.gameBoy.pushBy(this, null, dir);
+        this.gameBoy.pushBy(this, null, dir);
     }
-
-    public void removePos(Position pos) { this.mapPositions.remove(pos); }
 
     static public String readMapFromScanner(Scanner scanner, List<List<Integer>> map) {
 //        map = new ArrayList<>();
-        String text = "";
+        StringBuilder text = new StringBuilder();
 
-        int i = 0, j = 0;
+        int i = 0;
 
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
-            text += line + "\n";
+            text.append(line).append("\n");
 
             String[] lineItems = line.split(" ");
 
-            if(j == 0) map.add(new ArrayList<>());
+            map.add(new ArrayList<>());
 
             for(String s : lineItems) {
                 int num = Character.getNumericValue(s.charAt(0));
                 map.get(i).add(num);
-                ++j;
             }
 
             ++i;
-            j = 0;
         }
 
-        return text;
+        return text.toString();
     }
 
     public List<Position> getMapPositions() {
@@ -205,15 +188,15 @@ public class Map implements Serializable {
     }
 
     static public String map2String(List<List<Integer>> map) {
-        String text = "";
+        StringBuilder text = new StringBuilder();
 
-        for(List<Integer> row : defaultPositions)
+        for(List<Integer> row : map)
             for(int i = 0; i < row.size(); ++i) {
-                if(i != row.size() - 1) text += row.get(i) + " ";
-                else text += row.get(i) + "\n";
+                if(i != row.size() - 1) text.append(row.get(i)).append(" ");
+                else text.append(row.get(i)).append("\n");
             }
 
-        return text;
+        return text.toString();
     }
 
     static public String defaultPosition2String() {
@@ -230,7 +213,7 @@ public class Map implements Serializable {
         }
 
         for(Position pos: mapPositions) {
-            Integer i = 0;
+            int i;
             if(pos.peak() instanceof Space) {
                 i = 0;
             } else if(pos.peak() instanceof Wall) {
@@ -241,7 +224,7 @@ public class Map implements Serializable {
                 i = 4;
             } else if(pos.peak() instanceof Box) {
                 i = 5;
-            }
+            } else { i = 0; }
 
             sMap.get(pos.getRow()).set(pos.getCol(), i);
         }

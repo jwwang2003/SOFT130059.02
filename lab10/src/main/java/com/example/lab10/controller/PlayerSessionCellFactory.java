@@ -7,7 +7,6 @@ import javafx.util.Callback;
 
 
 public class PlayerSessionCellFactory implements Callback<ListView<PlayerSession>, ListCell<PlayerSession>> {
-
     @Override
     public ListCell<PlayerSession> call(ListView<PlayerSession> param) {
         return new PlayerData();
